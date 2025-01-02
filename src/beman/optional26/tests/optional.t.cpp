@@ -11,6 +11,7 @@
 #include <ranges>
 #include <tuple>
 #include <algorithm>
+#include <any>
 
 #include <gtest/gtest.h>
 
@@ -897,4 +898,14 @@ TEST(OptionalTest, HashTest) {
         auto h2 = std::hash<int>{}(i);
         EXPECT_EQ(h1, h2);
     }
+}
+
+TEST(OptionalTest, OptionalOfAnyWorks) {
+    beman::optional26::optional<std::any> o1 = 42;
+
+    beman::optional26::optional<std::any> o2 = o1;
+    EXPECT_TRUE(std::any_cast<const int&>(*o2) == 42);
+
+    beman::optional26::optional<std::any> o3 = std::move(o1);
+    EXPECT_TRUE(std::any_cast<const int&>(*o3) == 42);
 }
