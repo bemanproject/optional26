@@ -898,3 +898,94 @@ TEST(OptionalTest, HashTest) {
         EXPECT_EQ(h1, h2);
     }
 }
+
+// Moving an `optional<T&>` should not move the remote value.
+TEST(OptionalTest, OptionalFromOptionalRef) {
+    using beman::optional26::tests::copyable_from_non_const_lvalue_only;
+
+    copyable_from_non_const_lvalue_only cm;
+
+    beman::optional26::optional<copyable_from_non_const_lvalue_only&> o1 = cm;
+    ASSERT_TRUE(o1);
+
+    {
+        beman::optional26::optional<copyable_from_non_const_lvalue_only> o2 = o1;
+        ASSERT_TRUE(o2);
+    }
+
+    beman::optional26::optional<copyable_from_non_const_lvalue_only> o2 = std::move(o1);
+    ASSERT_TRUE(o2);
+
+    o2 = o1;
+    ASSERT_TRUE(o2);
+
+    o2 = std::move(o1);
+    ASSERT_TRUE(o2);
+
+    o2.reset();
+    o2 = o1;
+    ASSERT_TRUE(o2);
+
+    o2.reset();
+    o2 = std::move(o1);
+    ASSERT_TRUE(o2);
+}
+
+TEST(OptionalTest, OptionalFromOptionalRefExplicit) {
+    using beman::optional26::tests::copyable_from_non_const_lvalue_only;
+    using beman::optional26::tests::explicitly_convertible_from_non_const_lvalue_only;
+
+    explicitly_convertible_from_non_const_lvalue_only ec;
+
+    beman::optional26::optional<explicitly_convertible_from_non_const_lvalue_only&> o3 = ec;
+
+    beman::optional26::optional<copyable_from_non_const_lvalue_only> o4(o3);
+    ASSERT_TRUE(o4);
+    beman::optional26::optional<copyable_from_non_const_lvalue_only> o5(std::move(o3));
+    ASSERT_TRUE(o5);
+}
+
+TEST(OptionalTest, OptionalFromOptionalConstRef) {
+    using beman::optional26::tests::copyable_from_const_lvalue_only;
+
+    copyable_from_const_lvalue_only cm;
+
+    beman::optional26::optional<const copyable_from_const_lvalue_only&> o1 = cm;
+    ASSERT_TRUE(o1);
+
+    {
+        beman::optional26::optional<copyable_from_const_lvalue_only> o2 = o1;
+        ASSERT_TRUE(o2);
+    }
+
+    beman::optional26::optional<copyable_from_const_lvalue_only> o2 = std::move(o1);
+    ASSERT_TRUE(o2);
+
+    o2 = o1;
+    ASSERT_TRUE(o2);
+
+    o2 = std::move(o1);
+    ASSERT_TRUE(o2);
+
+    o2.reset();
+    o2 = o1;
+    ASSERT_TRUE(o2);
+
+    o2.reset();
+    o2 = std::move(o1);
+    ASSERT_TRUE(o2);
+}
+
+TEST(OptionalTest, OptionalFromOptionalConstRefExplicit) {
+    using beman::optional26::tests::copyable_from_const_lvalue_only;
+    using beman::optional26::tests::explicitly_convertible_from_const_lvalue_only;
+
+    explicitly_convertible_from_const_lvalue_only ec;
+
+    beman::optional26::optional<const explicitly_convertible_from_const_lvalue_only&> o3 = ec;
+
+    beman::optional26::optional<copyable_from_const_lvalue_only> o4(o3);
+    ASSERT_TRUE(o4);
+    beman::optional26::optional<copyable_from_const_lvalue_only> o5(std::move(o3));
+    ASSERT_TRUE(o5);
+}
